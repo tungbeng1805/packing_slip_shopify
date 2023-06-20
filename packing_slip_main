@@ -1,421 +1,415 @@
 <div class="wrapper">
-    <div class="header">
-      <div class="shop-title">
-          <img src="https://cdn.shopify.com/s/files/1/0367/6189/4956/files/Logo_In_MenuTab_1_1.png?v=1647610647" style="float: left;" width="150">
-      </div>
-      <div class="order-title">
-        <p class="text-align-right">
-          Order Date｜注文日. {{ order.created_at | date: "%Y/%m/%d"}}<br>
-          Order No｜注文番号. {{ order.order_number }}
-        </p>
-      </div>
+  <div class="header">
+    <div class="shop-title">
+        <img src="https://cdn.shopify.com/s/files/1/0367/6189/4956/files/Logo_In_MenuTab_1_1.png?v=1647610647" style="float: left;" width="150">
     </div>
-    <div class="customer-addresses">
-      <div class="shipping-address">
-        <p class="address-detail to-uppercase" style="font-weight: 700; font-size: 26px; white-space: nowrap;">
-          HÓA ĐƠN MUA HÀNG<br>お買い上げ明細書
-        </p>
-      </div>
-      <div class="billing-address">
-        <p class="address-detail text-align-right">
-          SE-SO INC.｜ＳＥ－ＳＯ株式会社<br>
-          〒332-0001 埼玉県川口市朝日<br>
-          ６丁目１２−８ メゾン川口朝日１‐１F<br>
-          Fanpage Facebook: @Sesofoods<br>
-          Tel：048-234-7000｜Email：info@sesofoods.com
-        </p>
-      </div>
-    </div>
-    <hr>
-  
-    <h3 style="margin: 1em 0 1em 0;">Địa chỉ nhận hàng｜お届け先</h3>
-  
-    <div style="margin: 0 0 1em 0; padding: 1em; border: 1px solid black;">
-      <strong>{{ shipping_address.name }}様</strong><br>
-      {% if shipping_address.company %}
-          {{ shipping_address.company }}<br>
-      {% endif %}
-       <strong>Address｜ご住所：</strong> 〒{{ shipping_address.zip | upcase }} {{ shipping_address.province }} {{ shipping_address.city }} {{ shipping_address.street }}<br>
-      <strong>Tel｜連絡先：</strong> {{ shipping_address.phone }}<br>
-      <strong>Thời gian nhận hàng｜お届け時間希望：</strong> Không yêu cầu 
-    </div>
-  
-    <h3 style="margin: 1.5em 0 1em 0;">Chi tiết đơn hàng｜注文明細</h3>
-    <div class="order-container">
-      <div class="order-container-header">
-          <div class="w-10">
-              <p class="subtitle-bold to-uppercase">
-                  Check<br>検品
-              </p>
-          </div>
-          <div class="w-10">
-              <p class="subtitle-bold to-uppercase">
-                  SL<br>数量
-              </p>
-          </div>
-          <div class="w-60">
-              <p class="subtitle-bold to-uppercase">
-                  Tên sản phẩm<br>商品名
-              </p>
-          </div>
-          <div class="w-10">
-              <p class="subtitle-bold to-uppercase">
-                  Giá<br>単価
-              </p>
-          </div>
-          <div class="w-10">
-              <p class="subtitle-bold to-uppercase">
-                  Tổng<br>金額
-              </p>
-          </div>
-      </div>
-  
-      {% for line_item in order.line_items %}
-        <div class="flex-line-item body-record">
-          <div class="w-10">
-            <p class="text-align-left">
-              ▢ ▢
-            </p>
-          </div>
-          <div class="flex-line-item-description w-10">
-              <p class="text-align-left">
-                  {{ line_item.quantity }} x
-              </p>
-          </div>
-          <div class="flex-line-item-quantity w-60">
-            <p class="">
-              {% if line_item.product != null %}
-                  {{ line_item.product.title }}
-              {% else %}
-                  {{ line_item.title }}
-              {% endif %}
-  
-              {% if line_item.variant.title != 'Default Title' and line_item.variant.title != '' %}
-                  {{ line_item.variant.title }}
-              {% endif %}
-            </p>
-          </div>
-          <div class="flex-line-item-quantity w-10">
-              <p class="text-align-left">
-                  {% assign final_price = nil %}
-                  {% for item in order.line_items %}
-                      {% if item.sku == line_item.sku %}
-                      {% assign final_price = item.final_price %}
-                      {% endif %}
-                  {% endfor %}
-                  {% if final_price %}
-                      {{ final_price | money }}
-                  {% endif %}
-              </p>
-          </div>
-          <div class="flex-line-item-quantity w-10">
-              <p class="text-align-left">
-                  {% if final_price %}
-                  {% assign final_prices =  final_price |times: line_item.quantity %}
-                  {% endif %}
-                  {{ final_prices | money }}
-              </p>
-          </div>
-        </div>
-      {% endfor %}
-    </div>
-  
-    <h3 style="margin: 1.5em 0 1em 0;">Chi tiết thanh toán｜お支払い明細</h3>
-  
-    <div class="border" style="padding: 0 10px 0 10px;">
-      <div class="flex-line-item body-record">
-          <div style="width: 60%;">Phương thức thanh toán｜お支払い方法</div>
-          <div class="text-align-right" style="width: 40%;">
-              {% for tag in order.tags %}
-                  {% if tag == 'Credit' or tag == 'スマホ決済' or tag == 'コンビニ決済' or tag == 'COD' %}
-                      {{ tag }}
-                  {% endif %}
-              {% endfor %}
-          </div>
-      </div>
-      {% if shipping_address %}
-      <div class="flex-line-item body-record" >
-          <div style="width: 60%;">Phí vận chuyển hoặc phí lạnh｜送料またはクール便料</div>
-          <div class="text-align-right" style="width: 40%;">
-              {{ order.shipping_price | money }}
-          </div>
-      </div>
-      {% endif %}
-      {% for discount in order.discount_applications %}
-      <div class="flex-line-item body-record" >
-          <div style="width: 60%;">Áp dụng mã giảm giá｜クーポン適用： "{{ discount.title }}"</div>
-          <div class="text-align-right" style="width: 40%;">
-              {{ discount.total_allocated_amount | money }}
-          </div>
-      </div>
-      {% endfor %}
-      <div class="flex-line-item body-record" >
-          <div style="width: 60%;">Tổng tiền (đã bao gồm thuế)｜合計金額（税込）</div>
-          <div class="text-align-right" style="width: 40%;">
-              {{ order.total_price | money }}
-          </div>
-      </div>
-    </div>
-  
-    <p>※Nếu quý khách chọn hình thức thanh toán daibiki (COD)sẽ trả thêm phụ phí thu hộ khi nhận hàng｜代引き手数料を別途請求いたします。</p>
-  
-      <div>
-          {% if order.note != null %}
-          <h3 style="margin: 0 0 1em 0;">Ghi chú｜ご注文に関するメモ</h3>
-          <div style="margin: 0 0 1em 0; padding: 1em; border: 0.5px solid black;">
-          <p>{{ order.note }}</p>
-          {% endif %}
-      </div>
-  
-      <strong>Phụ trách｜乾燥品ピッキング：．．．．．｜クール品ピッキング．．．．．｜梱包者．．．．．</strong>
-      <p>Xin chân thành cảm ơn quý khách hàng đã sử dụng Sesofoods.com<br>
-      Nếu có bất kì thắc mắc nào, quý khách vui lòng truy cập sesofoods.com hoặc liên hệ địa chỉ trên.<br>
-      お買い上げ頂きまして誠にありがとうございます。商品や請求金額などご不明な点がございましたら、弊社までお気軽にお問い合わせくださいませ。
+    <div class="order-title">
+      <p class="text-align-right">
+        Order Date｜注文日. {{ order.created_at | date: "%Y/%m/%d"}}<br>
+        Order No｜注文番号. {{ order.order_number }}
       </p>
+    </div>
   </div>
-  <style type="text/css">
-    body {
-      font-size: 20px;
-    }
-  
-    * {
-      box-sizing: border-box;
-    }
-  
-    .wrapper {
-      width: 100%;
-      margin: auto;
-      padding: 0;
-      font-family: "Noto Sans", sans-serif;
-      font-weight: 250;
-    }
-  
-    .header {
-      width: 100%;
-      display: -webkit-box;
-      display: -webkit-flex;
-      display: flex;
-      flex-direction: row;
-      align-items: top;
-    }
-  
-    .header p {
-      margin: 0;
-    }
-  
-    .shop-title {
-      -webkit-box-flex: 6;
-      -webkit-flex: 6;
-      flex: 6;
-      font-size: 1.9em;
-    }
-  
-    .order-title {
-      -webkit-box-flex: 4;
-      -webkit-flex: 4;
-      flex: 4;
-    }
-  
-    .customer-addresses {
-      width: 100%;
-      display: inline-block;
-      margin: 2em 0;
-    }
-  
-    .address-detail {
-      margin: 0.7em 0 0;
-      line-height: 1.5;
-    }
-  
-    .subtitle-bold {
-      font-weight: bold;
-      margin: 0;
-      font-size: 0.85em;
-    }
-  
-    .to-uppercase {
-      text-transform: uppercase;
-    }
-  
-    .text-align-right {
-      text-align: right;
-    }
-  
-    .shipping-address {
-      float: left;
-      min-width: 18em;
-      max-width: 50%;
-    }
-  
-    .billing-address {
-      padding-left: 20em;
-      min-width: 18em;
-    }
-  
-    .order-container {
-      padding: 0 0.7em;
-      border: 1px solid;
-    }
-  
-    .order-container-header {
-      display: -webkit-box;
-      display: -webkit-flex;
-      display: flex;
-      width: 100%;
-      margin-top: 10px;
-      border-bottom: 1px solid;
-      padding-bottom: 10px;
-    }
-  
-    .order-container-header-left-content {
-      float: left;
-    }
-  
-    .order-container-header-right-content {
-      float: right;
-    }
-  
-    .order-container-header-center-content {
-      text-align: center;
-    }
-  
-    .flex-line-item {
-      display: -webkit-box;
-      display: -webkit-flex;
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      margin: 5px 0;
-      page-break-inside: avoid;
-    }
-  
-    .flex-line-item-img {
-      margin-right: 1.4em;
-      min-width: {{ desired_image_size }}px;
-    }
-  
-    .flex-line-item-description {
-      -webkit-box-flex: 7;
-      -webkit-flex: 7;
-      flex: 7;
-    }
-  
-    .line-item-description-line {
-      display: block;
-    }
-  
-    .flex-line-item-description p {
-      margin: 0;
-      line-height: 1.5;
-    }
-  
-    .flex-line-item-quantity {
-      -webkit-box-flex: 3;
-      -webkit-flex: 3;
-      flex: 3;
-    }
-  
-    .subdued-separator {
-      height: 0.07em;
-      border: none;
-      color: lightgray;
-      background-color: lightgray;
-      margin: 0;
-    }
-  
-    .missing-line-items-text {
-      margin: 1.4em 0;
-      padding: 0 0.7em;
-    }
-  
-    .notes {
-      margin-top: 2em;
-    }
-  
-    .notes p {
-      margin-bottom: 0;
-    }
-  
-    .notes .notes-details {
-      margin-top: 0.7em;
-    }
-  
-    .footer {
-      margin-top: 2em;
-      text-align: center;
-      line-height: 1.5;
-    }
-  
-    .footer p {
-      margin: 0;
-      margin-bottom: 1.4em;
-    }
-  
-    hr {
-      height: 0.14em;
-      border: none;
-      color: black;
-      background-color: black;
-      margin: 0;
-    }
-  
-    .aspect-ratio {
-      position: relative;
-      display: block;
-      background: #fafbfc;
-      padding: 0;
-    }
-  
-    .aspect-ratio::before {
-      z-index: 1;
-      content: "";
-      position: absolute;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      left: 0;
-      border: 1px solid rgba(195,207,216,0.3);
-    }
-  
-    .aspect-ratio--square {
-      width: 100%;
-      padding-bottom: 100%;
-    }
-  
-    .aspect-ratio__content {
-      position: absolute;
-      max-width: 100%;
-      max-height: 100%;
-      display: block;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      left: 0;
-      margin: auto;
-    }
-  
-    .w-60 {
-      width: 60%;
-      max-width: 60%;
-      font-weight: 700;
-    }
-  
-    .w-10 {
-      width: 10%;
-      max-width: 10%;
-    }
-  
-    .body-record {
-      padding-bottom: 5px;
-      border-bottom: 1px solid;
-    }
-    .body-record:last-child {
-      border: none;
-      padding-bottom: 0;
-    }
-  
-    .border {
-      border: 1px solid;
-    }
-  </style>
-  
+  <div class="customer-addresses">
+    <div class="shipping-address">
+      <p class="address-detail to-uppercase" style="font-weight: 700; font-size: 26px; white-space: nowrap;">
+        HÓA ĐƠN MUA HÀNG<br>お買い上げ明細書
+      </p>
+    </div>
+    <div class="billing-address">
+      <p class="address-detail text-align-right">
+        SE-SO INC.｜ＳＥ－ＳＯ株式会社<br>
+        〒332-0001 埼玉県川口市朝日<br>
+        ６丁目１２−８ メゾン川口朝日１‐１F<br>
+        Fanpage Facebook: @Sesofoods<br>
+        Tel：048-234-7000｜Email：info@sesofoods.com
+      </p>
+    </div>
+  </div>
+  <hr>
+
+  <h3 style="margin: 1em 0 1em 0;">Địa chỉ nhận hàng｜お届け先</h3>
+
+  <div style="margin: 0 0 1em 0; padding: 1em; border: 1px solid black;">
+    <strong>{{ shipping_address.name }}様</strong><br>
+    {% if shipping_address.company %}
+        {{ shipping_address.company }}<br>
+    {% endif %}
+     <strong>Address｜ご住所：</strong> 〒{{ shipping_address.zip | upcase }} {{ shipping_address.province }} {{ shipping_address.city }} {{ shipping_address.street }}<br>
+    <strong>Tel｜連絡先：</strong> {{ shipping_address.phone }}<br>
+  </div>
+
+  <h3 style="margin: 1.5em 0 1em 0;">Chi tiết đơn hàng｜注文明細</h3>
+  <div class="order-container">
+    <div class="order-container-header">
+        <div class="w-10">
+            <p class="subtitle-bold to-uppercase">
+                Check<br>検品
+            </p>
+        </div>
+        <div class="w-10">
+            <p class="subtitle-bold to-uppercase">
+                SL<br>数量
+            </p>
+        </div>
+        <div class="w-60">
+            <p class="subtitle-bold to-uppercase">
+                Tên sản phẩm<br>商品名
+            </p>
+        </div>
+        <div class="w-10">
+            <p class="subtitle-bold to-uppercase">
+                Giá<br>単価
+            </p>
+        </div>
+        <div class="w-10">
+            <p class="subtitle-bold to-uppercase">
+                Tổng<br>金額
+            </p>
+        </div>
+    </div>
+
+    {% for line_item in order.line_items %}
+      <div class="flex-line-item body-record">
+        <div class="w-10">
+          <p class="text-align-left">
+            ▢ ▢
+          </p>
+        </div>
+        <div class="flex-line-item-description w-10">
+            <p class="text-align-left">
+                {{ line_item.quantity }} x
+            </p>
+        </div>
+        <div class="flex-line-item-quantity w-60">
+          <p class="">
+            {% if line_item.product != null %}
+                {{ line_item.product.title }}
+            {% else %}
+                {{ line_item.title }}
+            {% endif %}
+
+            {% if line_item.variant.title != 'Default Title' and line_item.variant.title != '' %}
+                {{ line_item.variant.title }}
+            {% endif %}
+          </p>
+        </div>
+        <div class="flex-line-item-quantity w-10">
+            <p class="text-align-left">
+                {% assign final_price = nil %}
+                {% assign final_price = line_item.final_price %}
+                {% if final_price %}
+                    {{ final_price | money }}
+                {% endif %}
+            </p>
+        </div>
+        <div class="flex-line-item-quantity w-10">
+            <p class="text-align-left">
+                {% if final_price %}
+                {% assign final_prices =  final_price |times: line_item.quantity %}
+                {% endif %}
+                {{ final_prices | money }}
+            </p>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  <h3 style="margin: 1.5em 0 1em 0;">Chi tiết thanh toán｜お支払い明細</h3>
+
+  <div class="border" style="padding: 0 10px 0 10px;">
+    <div class="flex-line-item body-record">
+        <div style="width: 60%;">Phương thức thanh toán｜お支払い方法</div>
+        <div class="text-align-right" style="width: 40%;">
+            {% for tag in order.tags %}
+                {% if tag == 'Credit' or tag == 'スマホ決済' or tag == 'コンビニ決済' or tag == 'COD' %}
+                    {{ tag }}
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    {% if shipping_address %}
+    <div class="flex-line-item body-record" >
+        <div style="width: 60%;">Phí vận chuyển hoặc phí lạnh｜送料またはクール便料</div>
+        <div class="text-align-right" style="width: 40%;">
+            {{ order.shipping_price | money }}
+        </div>
+    </div>
+    {% endif %}
+    {% for discount in order.discount_applications %}
+    <div class="flex-line-item body-record" >
+        <div style="width: 60%;">Áp dụng mã giảm giá｜クーポン適用： "{{ discount.title }}"</div>
+        <div class="text-align-right" style="width: 40%;">
+           {{ discount.total_allocated_amount | money }}
+        </div>
+    </div>
+    {% endfor %}
+    <div class="flex-line-item body-record" >
+        <div style="width: 60%;">Tổng tiền (đã bao gồm thuế)｜合計金額（税込）</div>
+        <div class="text-align-right" style="width: 40%;">
+            {{ order.total_price | money }}
+        </div>
+    </div>
+  </div>
+
+  <p>※Nếu quý khách chọn hình thức thanh toán daibiki (COD)sẽ trả thêm phụ phí thu hộ khi nhận hàng｜代引き手数料を別途請求いたします。</p>
+
+    <div>
+        {% if order.note != null %}
+        <h3 style="margin: 0 0 1em 0;">Ghi chú｜ご注文に関するメモ</h3>
+        <div style="margin: 0 0 1em 0; padding: 1em; border: 0.5px solid black;">
+        <p>{{ order.note }}</p>
+        {% endif %}
+    </div>
+
+    <strong>Phụ trách｜乾燥品ピッキング：．．．．．｜クール品ピッキング．．．．．｜梱包者．．．．．</strong>
+    <p>Xin chân thành cảm ơn quý khách hàng đã sử dụng Sesofoods.com<br>
+    Nếu có bất kì thắc mắc nào, quý khách vui lòng truy cập sesofoods.com hoặc liên hệ địa chỉ trên.<br>
+    お買い上げ頂きまして誠にありがとうございます。商品や請求金額などご不明な点がございましたら、弊社までお気軽にお問い合わせくださいませ。
+    </p>
+</div>
+<style type="text/css">
+  body {
+    font-size: 20px;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  .wrapper {
+    width: 100%;
+    margin: auto;
+    padding: 0;
+    font-family: "Noto Sans", sans-serif;
+    font-weight: 250;
+  }
+
+  .header {
+    width: 100%;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    flex-direction: row;
+    align-items: top;
+  }
+
+  .header p {
+    margin: 0;
+  }
+
+  .shop-title {
+    -webkit-box-flex: 6;
+    -webkit-flex: 6;
+    flex: 6;
+    font-size: 1.9em;
+  }
+
+  .order-title {
+    -webkit-box-flex: 4;
+    -webkit-flex: 4;
+    flex: 4;
+  }
+
+  .customer-addresses {
+    width: 100%;
+    display: inline-block;
+    margin: 2em 0;
+  }
+
+  .address-detail {
+    margin: 0.7em 0 0;
+    line-height: 1.5;
+  }
+
+  .subtitle-bold {
+    font-weight: bold;
+    margin: 0;
+    font-size: 0.85em;
+  }
+
+  .to-uppercase {
+    text-transform: uppercase;
+  }
+
+  .text-align-right {
+    text-align: right;
+  }
+
+  .shipping-address {
+    float: left;
+    min-width: 18em;
+    max-width: 50%;
+  }
+
+  .billing-address {
+    padding-left: 20em;
+    min-width: 18em;
+  }
+
+  .order-container {
+    padding: 0 0.7em;
+    border: 1px solid;
+  }
+
+  .order-container-header {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    width: 100%;
+    margin-top: 10px;
+    border-bottom: 1px solid;
+    padding-bottom: 10px;
+  }
+
+  .order-container-header-left-content {
+    float: left;
+  }
+
+  .order-container-header-right-content {
+    float: right;
+  }
+
+  .order-container-header-center-content {
+    text-align: center;
+  }
+
+  .flex-line-item {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: 5px 0;
+    page-break-inside: avoid;
+  }
+
+  .flex-line-item-img {
+    margin-right: 1.4em;
+    min-width: {{ desired_image_size }}px;
+  }
+
+  .flex-line-item-description {
+    -webkit-box-flex: 7;
+    -webkit-flex: 7;
+    flex: 7;
+  }
+
+  .line-item-description-line {
+    display: block;
+  }
+
+  .flex-line-item-description p {
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  .flex-line-item-quantity {
+    -webkit-box-flex: 3;
+    -webkit-flex: 3;
+    flex: 3;
+  }
+
+  .subdued-separator {
+    height: 0.07em;
+    border: none;
+    color: lightgray;
+    background-color: lightgray;
+    margin: 0;
+  }
+
+  .missing-line-items-text {
+    margin: 1.4em 0;
+    padding: 0 0.7em;
+  }
+
+  .notes {
+    margin-top: 2em;
+  }
+
+  .notes p {
+    margin-bottom: 0;
+  }
+
+  .notes .notes-details {
+    margin-top: 0.7em;
+  }
+
+  .footer {
+    margin-top: 2em;
+    text-align: center;
+    line-height: 1.5;
+  }
+
+  .footer p {
+    margin: 0;
+    margin-bottom: 1.4em;
+  }
+
+  hr {
+    height: 0.14em;
+    border: none;
+    color: black;
+    background-color: black;
+    margin: 0;
+  }
+
+  .aspect-ratio {
+    position: relative;
+    display: block;
+    background: #fafbfc;
+    padding: 0;
+  }
+
+  .aspect-ratio::before {
+    z-index: 1;
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    border: 1px solid rgba(195,207,216,0.3);
+  }
+
+  .aspect-ratio--square {
+    width: 100%;
+    padding-bottom: 100%;
+  }
+
+  .aspect-ratio__content {
+    position: absolute;
+    max-width: 100%;
+    max-height: 100%;
+    display: block;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    margin: auto;
+  }
+
+  .w-60 {
+    width: 60%;
+    max-width: 60%;
+    font-weight: 700;
+  }
+
+  .w-10 {
+    width: 10%;
+    max-width: 10%;
+  }
+
+  .body-record {
+    padding-bottom: 5px;
+    border-bottom: 1px solid;
+  }
+  .body-record:last-child {
+    border: none;
+    padding-bottom: 0;
+  }
+
+  .border {
+    border: 1px solid;
+  }
+</style>
