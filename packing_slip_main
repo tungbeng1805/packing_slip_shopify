@@ -70,6 +70,8 @@
     </div>
 
     {% for line_item in order.line_items %}
+    {% for line_item_in_shipment in line_items_in_shipment %}
+      {% if line_item_in_shipment.title == line_item.product.title or line_item_in_shipment.title == line_item.title %}
       <div class="flex-line-item body-record">
         <div class="w-10">
           <p class="text-align-left">
@@ -90,7 +92,7 @@
             {% endif %}
 
             {% if line_item.variant.title != 'Default Title' and line_item.variant.title != '' %}
-                {{ line_item.variant.title }}
+               - {{ line_item.variant.title }}
             {% endif %}
           </p>
         </div>
@@ -112,6 +114,9 @@
             </p>
         </div>
       </div>
+      {% endif %}
+    {% endfor %}
+
     {% endfor %}
   </div>
 
@@ -140,7 +145,7 @@
     <div class="flex-line-item body-record" >
         <div style="width: 60%;">Áp dụng mã giảm giá｜クーポン適用： "{{ discount.title }}"</div>
         <div class="text-align-right" style="width: 40%;">
-           {{ discount.total_allocated_amount | money }}
+          - {{ discount.total_allocated_amount | money }}
         </div>
     </div>
     {% endfor %}
