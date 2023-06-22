@@ -68,56 +68,92 @@
               </p>
           </div>
       </div>
-  
-      {% for line_item in order.line_items %}
+
       {% for line_item_in_shipment in line_items_in_shipment %}
-        {% if line_item_in_shipment.title == line_item.product.title or line_item_in_shipment.title == line_item.title %}
-        <div class="flex-line-item body-record">
-          <div class="w-10">
-            <p class="text-align-left">
-              ▢ ▢
-            </p>
-          </div>
-          <div class="flex-line-item-description w-10">
-              <p class="text-align-left">
-                  {{ line_item.quantity }} x
-              </p>
-          </div>
-          <div class="flex-line-item-quantity w-60">
-            <p class="">
-              {% if line_item.product != null %}
-                  {{ line_item.product.title }}
-              {% else %}
-                  {{ line_item.title }}
-              {% endif %}
-  
-              {% if line_item.variant.title != 'Default Title' and line_item.variant.title != '' %}
-                 - {{ line_item.variant.title }}
-              {% endif %}
-            </p>
-          </div>
-          <div class="flex-line-item-quantity w-10">
-              <p class="text-align-left">
-                  {% assign final_price = nil %}
-                  {% assign final_price = line_item.final_price %}
-                  {% if final_price %}
-                      {{ final_price | money }}
+        {% for line_item in order.line_items %}
+          {% if line_item_in_shipment.title == line_item.product.title and line_item_in_shipment.shipping_quantity == line_item.quantity %}
+            <div class="flex-line-item body-record">
+              <div class="w-10">
+                <p class="text-align-left">
+                  ▢ ▢
+                </p>
+              </div>
+              <div class="flex-line-item-description w-10">
+                  <p class="text-align-left">
+                      {{ line_item_in_shipment.shipping_quantity }} x
+                  </p>
+              </div>
+              <div class="flex-line-item-quantity w-60">
+                <p class="">
+                  {{line_item_in_shipment.title}}
+                  
+                  {% if line_item.variant.title != 'Default Title' and line_item.variant.title != '' %}
+                    - {{ line_item.variant.title }}
                   {% endif %}
-              </p>
-          </div>
-          <div class="flex-line-item-quantity w-10">
+                </p>
+              </div>
+              <div class="flex-line-item-quantity w-10">
+                  <p class="text-align-left">
+                      {% assign final_price = nil %}
+                      {% assign final_price = line_item.final_price %}
+                      {% if final_price %}
+                          {{ final_price | money }}
+                      {% endif %}
+                  </p>
+              </div>
+              <div class="flex-line-item-quantity w-10">
+                  <p class="text-align-left">
+                      {% if final_price %}
+                      {% assign final_prices =  final_price |times: line_item.quantity %}
+                      {% endif %}
+                      {{ final_prices | money }}
+                  </p>
+              </div>
+            </div>
+          {% endif %}
+          {% if line_item_in_shipment.title == line_item.title and line_item.product == null %}
+          <div class="flex-line-item body-record">
+            <div class="w-10">
               <p class="text-align-left">
-                  {% if final_price %}
-                  {% assign final_prices =  final_price |times: line_item.quantity %}
-                  {% endif %}
-                  {{ final_prices | money }}
+                ▢ ▢
               </p>
+            </div>
+            <div class="flex-line-item-description w-10">
+                <p class="text-align-left">
+                    {{ line_item_in_shipment.shipping_quantity }} x
+                </p>
+            </div>
+            <div class="flex-line-item-quantity w-60">
+              <p class="">
+                {{line_item_in_shipment.title}}
+                
+                {% if line_item.variant.title != 'Default Title' and line_item.variant.title != '' %}
+                  - {{ line_item.variant.title }}
+                {% endif %}
+              </p>
+            </div>
+            <div class="flex-line-item-quantity w-10">
+                <p class="text-align-left">
+                    {% assign final_price = nil %}
+                    {% assign final_price = line_item.final_price %}
+                    {% if final_price %}
+                        {{ final_price | money }}
+                    {% endif %}
+                </p>
+            </div>
+            <div class="flex-line-item-quantity w-10">
+                <p class="text-align-left">
+                    {% if final_price %}
+                    {% assign final_prices =  final_price |times: line_item.quantity %}
+                    {% endif %}
+                    {{ final_prices | money }}
+                </p>
+            </div>
           </div>
-        </div>
-        {% endif %}
+          {% endif %}
+        {% endfor %}
       {% endfor %}
-  
-      {% endfor %}
+
     </div>
   
     <h3 style="margin: 1.5em 0 1em 0;">Chi tiết thanh toán｜お支払い明細</h3>
